@@ -1,0 +1,350 @@
+{
+  "name": "My workflow 2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://notion.so/releases",
+        "responseFormat": "string",
+        "options": {}
+      },
+      "id": "45be8cf1-eab5-40e3-ab8e-3676b9143904",
+      "name": "Fetch Release Notes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        832,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "responseFormat": "string",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\n  \"model\": \"openai/gpt-3.5-turbo\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Extract the following 5 things from the given changelog:\\n\\n1. competitor\\n2. featureTitle (short and clear)\\n3. category (as tags like \\\"AI\\\", \\\"UX\\\", etc.)\\n4. date (in format YYYY-MM-DD)\\n5. summary (1-2 line professional summary)\\n\\nChangelog:\\n\\\"Notion 2.43: Suggested edits are here + new Notion AI features\\\"\\n\\nReturn only valid JSON like this:\\n{\\n  \\\"competitor\\\": \\\"Notion\\\",\\n  \\\"featureTitle\\\": \\\"Suggested edits + new AI features\\\",\\n  \\\"category\\\": [\\\"AI\\\", \\\"UX\\\"],\\n  \\\"date\\\": \\\"2025-07-21\\\",\\n  \\\"summary\\\": \\\"Notion introduces suggested edits and expands its AI capabilities.\\\"\\n}\\n\\nOnly output JSON. No text, no explanation.\"\n    }\n  ]\n}\n",
+        "headerParametersJson": "{\"Authorization\": \"Bearer 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\", \"HTTP-Referer\": \"https://n8n.io\", \"X-Title\": \"CompetitorFeatureAgent\"}"
+      },
+      "id": "72332ed7-ce8d-4b1c-b0fa-b1cdc47cbbdf",
+      "name": "OpenRouter - Feature Extract",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Date",
+              "value": "={{$json[\"date\"]}}"
+            },
+            {
+              "name": "competitor",
+              "value": "={{ $json.competitor }}"
+            },
+            {
+              "name": "featureTitle",
+              "value": "={{ $json.featureTitle }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "summary",
+              "value": "={{ $json.summary }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "853dacfa-2c3f-4d24-8faf-fa025b736905",
+      "name": "Set Structured Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/124ezpkQ7XirXHUv8x7NNokq6MVp4aZibMTlIotYVj-s/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toISO() }} {{ $json.date }}",
+            "Competitor": "={{ $json.competitor }}",
+            "Feature Title": "={{ $json.featureTitle }}",
+            "Category": "={{ $json.category }}",
+            "Summary": "={{ $json.summary }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Competitor",
+              "displayName": "Competitor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Feature Title",
+              "displayName": "Feature Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3a0b9eeb-e15e-4792-8b2e-b473906775f8",
+      "name": "Save to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1824,
+        96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s7beeEo8nfl52blx",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": ".releaseNotes",
+              "cssSelector": "*"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        96
+      ],
+      "id": "51d517fd-bad7-433d-8b27-906c7193e2e6",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "chatId": "5466432448",
+        "text": "=🆕 *New Feature Update!*\n\n🏷️ *Title*: {{ $json[\"Feature Title\"].replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1') }}  \n🏢 *Competitor*: {{ $json.Competitor.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1') }}  \n\n🏷️ *Category*: {{ $json.Category.join(', ').replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1') }}\n\n📅 *Released On*: {{ $json.Date.split(\"T\")[0].replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1') }}\n\n\n📝 *Summary*:  \n{{ $json.Summary.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1') }}\n\n_Stay ahead of the curve with the latest updates!_\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        96
+      ],
+      "id": "aa1b1202-467b-4350-bdf4-bcfd809f2b67",
+      "name": "Send a text message",
+      "webhookId": "71d066b2-8de3-42fa-b361-b36d681de528",
+      "credentials": {
+        "telegramApi": {
+          "id": "Z2vGGYvcx6BKQEJT",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        96
+      ],
+      "id": "a0504926-bd4b-4be1-b083-8e64ebea1986",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = JSON.parse($input.first().json.data.choices[0].message.content);  // response.content म्हणजे OpenRouter response\n\nreturn [\n  {\n    json: output\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        96
+      ],
+      "id": "8ca1610f-df32-41fd-8dcd-370cde68bb98",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Fetch Release Notes": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter - Feature Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Structured Data": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter - Feature Extract": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Release Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Set Structured Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cab19bec-8a61-47f9-9284-5acbda0c2203",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fbb3987784d0a5b4e4c31b040e5e102079d669d4765f6aad34b4edcdcc7f73f4"
+  },
+  "id": "ZRqqQl2HtSmrjFA9",
+  "tags": []
+}
