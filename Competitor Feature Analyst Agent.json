@@ -24,7 +24,7 @@
         "jsonParameters": true,
         "options": {},
         "bodyParametersJson": "{\n  \"model\": \"openai/gpt-3.5-turbo\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Extract the following 5 things from the given changelog:\\n\\n1. competitor\\n2. featureTitle (short and clear)\\n3. category (as tags like \\\"AI\\\", \\\"UX\\\", etc.)\\n4. date (in format YYYY-MM-DD)\\n5. summary (1-2 line professional summary)\\n\\nChangelog:\\n\\\"Notion 2.43: Suggested edits are here + new Notion AI features\\\"\\n\\nReturn only valid JSON like this:\\n{\\n  \\\"competitor\\\": \\\"Notion\\\",\\n  \\\"featureTitle\\\": \\\"Suggested edits + new AI features\\\",\\n  \\\"category\\\": [\\\"AI\\\", \\\"UX\\\"],\\n  \\\"date\\\": \\\"2025-07-21\\\",\\n  \\\"summary\\\": \\\"Notion introduces suggested edits and expands its AI capabilities.\\\"\\n}\\n\\nOnly output JSON. No text, no explanation.\"\n    }\n  ]\n}\n",
-        "headerParametersJson": "{\"Authorization\": \"Bearer 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\", \"HTTP-Referer\": \"https://n8n.io\", \"X-Title\": \"CompetitorFeatureAgent\"}"
+        "headerParametersJson": "{\"Authorization\": \"Bearer API KEY\", \"HTTP-Referer\": \"https://n8n.io\", \"X-Title\": \"CompetitorFeatureAgent\"}"
       },
       "id": "72332ed7-ce8d-4b1c-b0fa-b1cdc47cbbdf",
       "name": "OpenRouter - Feature Extract",
